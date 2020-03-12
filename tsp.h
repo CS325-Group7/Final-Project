@@ -79,14 +79,14 @@ class TSP{
 		// set public functions
 		
 		void fillGraph();
-		int calcDistance(struct Cities cit1, struct Cities cit2);
 		int getMin(int index[], bool node_in[]);
 		void primsMST();
 		void matchOdds();
+		void addList(int parent[]);
 		void eulerCircuit(int begin, vector<int> &path);
 		void eulerHP(vector<int> &path, int &cost);
 		int findPath(int begin);
 		void sendFile();
-		int tour_size(){return verts;};
+		int tour_size();
 };
 #endif

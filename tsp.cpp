@@ -18,33 +18,39 @@ TSP::TSP(string in, string out){
 	
 	file_in = in;
 	file_out= out;
-	int read1;
-	int read2;
-	int read3;
 	int count;
 	count = 0;
 
 	ifstream input_in;
-	input_in.open(file_in.c_str(), ios::in);
+
+	// open file and convert to a c style string
+	
+	input_in.open(file_in.c_str());
 
 	while(!input_in.eof()){
 
 		// 3 variables on each line of the text files
 		// distance, x and y coords
 
+		int read1;
+        	int read2;
+        	int read3;
+		
 		input_in >> read1 >> read2 >> read3;
 		
-		count++;
 		// make a new city with the x and y coords
 
 		struct Cities city = {read2, read3};
 		cityList.push_back(city);
 
-		//count++;
+		// increment counter so the correct number of vertices 
+
+		count++;
 	}		
 	
 	count--;
 	verts = count;
+	
 	input_in.close();
 
 	graph = new int*[verts];
@@ -58,12 +64,15 @@ TSP::TSP(string in, string out){
 	for(i=0; i<verts; i++){
 	
 		graph[i] = new int[verts];
+
 		for(j=0; j<verts; j++){
 
 			graph[i][j] = 0;
 		}				
 	}
 
+	// allocate space for the lengths
+	
 	lengths = new int*[verts];
 
         for(i=0; i<verts; i++){
@@ -71,6 +80,8 @@ TSP::TSP(string in, string out){
                 lengths[i] = new int[verts];
         }
 
+	// set up cityList
+	
 	for(i=0; i<cityList.size(); i++){
 	
 		struct Cities curr = cityList[i];
@@ -81,51 +92,56 @@ TSP::TSP(string in, string out){
 	adj_list = new vector<int>[verts];	 
 }
 
-// set the destructor
-
-TSP::~TSP(){
-	
-	// initialize variables
-	
-	int i;
-
-	for(i=0; i<verts; i++){
-
-		delete[] graph[i];
-		delete[] lengths[i];
-	}	
-
-	delete[] lengths;
-	delete[] graph;
-	delete[] adj_list;
-}
+// fills the graph with the distances
 
 void TSP::fillGraph(){
 
+	// initialize the variables
+	
 	int i;
 	int j;
-	
+	int dis;
+
+	int xvar;
+	int yvar;
+
 	for(i=0; i<verts; i++){
 
 		for(j=0; j<verts; j++){
 
-			graph[i][j] = graph[j][i] = calcDistance(cityList[i], cityList[j]);
+			// calculates the x distance
+
+			xvar = cityList[i].x - cityList[j].x;
+			
+			// calculates the y distance
+
+			yvar = cityList[i].y- cityList[j].y;
+			
+			// calculates the distance with the equation provided in the assignment
+
+			dis = floor(sqrt(pow(xvar, 2) + pow(yvar, 2)));
+			
+			// set up graph
+
+			graph[j][i] = dis;			
+			graph[i][j] = graph[j][i];
 		}
 	}
 }
 
-int TSP::calcDistance(struct TSP::Cities cit1, struct TSP::Cities cit2){
-
-	return floor(sqrt(pow(cit1.x-cit2.x,2) + pow(cit1.y-cit2.y,2)));
-}
+// used in the prims MST to find the minimum
+// got help for this from https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/
 
 int TSP::getMin(int index[], bool node_in[]){
-	
+
+	// initialize the variables
+		
 	int min = std::numeric_limits<int>::max();
   	int min_index;
+
 	for (int i = 0; i < verts; i++) {
 
-		if(node_in[i] == false && index[i] < min){
+		if(node_in[i] != true && index[i] < min){
 	
 			min = index[i];
 			min_index = i;
@@ -135,58 +151,104 @@ int TSP::getMin(int index[], bool node_in[]){
 	return min_index;
 }
 
+// got help for this from https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/
+
 void TSP::primsMST(){
 
+	// initialize variables
+	
 	int index[verts];
 	int parent[verts];
 	bool node_in[verts];
 	int i;
-	//int min = std::numeric_limits<int>::max();
-	int min = INT_MAX;
-	int minimum;
 	int j;
 
 	for(i=0; i<verts; i++){
 
-		//index[i] = std::numeric_limits<int>::max();
+		// set to the maximum or infinity
+
 		index[i] = INT_MAX;
+		
+		// the node has not yet been included in the MST
+
 		node_in[i] = false;
 	}
-
+	
+	// set the parent to the root
+	
 	parent[0] = -1;
+	
+	// set the index to the first value
+	
 	index[0] = 0;
+
 	int u;
 
 	for(i=0; i<verts-1; i++){
-	
+
+		// find the min vertex not in the tree, yet
+
 		u = getMin(index, node_in);
 		
+		// now the node has been included
+
 		node_in[u] = true;
 		
 		int v;
 		
+		// iterate through the neighboring vertices that have not been looked at
+
 		for(v=0; v<verts; v++){
 
-			if(graph[u][v] && node_in[v] == false && graph[u][v] < index[v]){
+			// the node must not be included yet
+			// make sure the node is there
+			// make sure that the graph is less than the index that is before u
+
+			if(graph[u][v] && (node_in[v] != true) && (graph[u][v] < index[v])){
+
+				// parent node updated
 
 				parent[v] = u;
+				
+				// index updated
+
 				index[v] = graph[u][v];
+			}
+			
+			// if not, keep looking through vertices
+
+			else{
+
+				continue;
 			}
 		}										
 	}
 
-	// put into the agdjacency list
+	// add to the adjacency list
+	
+	addList(parent);	
+}
+
+// used in the prims MST to add values to the 
+// adjacency list
+
+void TSP::addList(int parent[]){
+
+	// initialize variables
+	
+	int i;
 	
 	for(i=0; i<verts; i++){
 
-		if(parent[i] != -1){
+                if(parent[i] != -1){
+
 
 			adj_list[i].push_back(parent[i]);;
-			adj_list[parent[i]].push_back(i);
+                        adj_list[parent[i]].push_back(i);
 		}
-	}	
+	}
 }
-
+ 
 void TSP::matchOdds(){
 
 	std::vector<int>::iterator start;
@@ -211,13 +273,11 @@ void TSP::matchOdds(){
 	while(!oddPairs.empty()){
 
 		vector<int>::iterator iter;
-		iter = oddPairs.begin()+1;
 		vector<int>::iterator stop = oddPairs.end();
 		start = oddPairs.begin();
 
-		//len = std::numeric_limits<int>::max();	
 		len = INT_MAX;
-		for(; iter != stop; iter++){
+		for(iter = oddPairs.begin()+1; iter != stop; iter++){
 
 			if(graph[*start][*iter] < len){
 
@@ -259,10 +319,8 @@ void TSP::eulerCircuit(int begin, vector<int> &path){
 		if(temp[check].empty()){
 
 			path.push_back(check);
-			//check = stack.top();
 			check = stack.top();
 			stack.pop();
-			//begin = check;
 		}
 
 		else{
@@ -270,6 +328,7 @@ void TSP::eulerCircuit(int begin, vector<int> &path){
 			stack.push(check);
 			close = temp[check].back();
 			temp[check].pop_back();
+
 			for(i=0; i<temp[close].size(); i++){
 
 				if(temp[close][i] == check){
@@ -340,17 +399,25 @@ int TSP::findPath(int begin){
 	return len;		
 }
 
+// adds the information to the .tour files
+
 void TSP::sendFile(){
 
 	// initialize variables
 	
 	ofstream send_out;
-	//vector<int>::iterator iter;
-
+	vector<int>::iterator iter;
+	
 	send_out.open(file_out.c_str(), ios::out);
+	
+	// adds an extra line to the file to be the length of the total path
+	
 	send_out << lenPath << endl;
 	
-	for( vector<int>::iterator iter = cycle.begin(); iter != cycle.end(); ++iter){
+	// iterates through the circuit to print out the distances taken
+	// to the file
+	
+	for(iter = cycle.begin(); iter != cycle.end(); ++iter){
 
 		send_out << *iter << endl;
 	}	
@@ -358,7 +425,28 @@ void TSP::sendFile(){
 	send_out.close();
 }
 
-/*int TSP::tour_size(){
+// finds the size of the tour, to be used in the main file
+
+int TSP::tour_size(){
 	
 	return verts;
-}*/
+}
+
+//set destructor
+
+TSP::~TSP(){
+
+	// initialize variables
+	
+	int i;
+
+        for(i=0; i<verts; i++){
+
+                delete[] graph[i];
+                delete[] lengths[i];
+        }
+
+        delete[] lengths;
+        delete[] graph;
+        delete[] adj_list;
+}
