@@ -3,17 +3,25 @@
  * Class: CS 325
  * Assignment: Final Project
  * Date: 3-13-2020
- * Description: handles the main function that reads in command line input and calls the 
+ * Description: handles the main function that reads in command line input and calls the
  * functions for the Christofides algorithm
  * *******/
 
 #include "tsp.h"
+#include <ctime>
 #include <iostream>
 
 int main(int argc, char** argv){
-	
+
+	//start timer for the algorithm
+	clock_t start, end;
+	//hold the total time at the end
+	double time;
+	//get current time as the start
+	start = clock();
+
 	// initialize variables
-	
+
 	string in;
 	string out;
 	int tourSize;
@@ -27,9 +35,9 @@ int main(int argc, char** argv){
 	out.append(".tour");
 
 	TSP tour(in, out);
-	tourSize = tour.tour_size();	
+	tourSize = tour.tour_size();
 
-	cout << "fill"<< endl;	
+	cout << "fill"<< endl;
 	tour.fillGraph();
 	cout << "mst"<< endl;
 	tour.primsMST();
@@ -41,8 +49,8 @@ int main(int argc, char** argv){
 		fin = tour.findPath(i);
 
 		tour.lengths[i][0] = i;
-		tour.lengths[i][1] = fin;		
-		
+		tour.lengths[i][1] = fin;
+
 		if(tour.lengths[i][1] < opt){
 
 			index = tour.lengths[i][0];
@@ -55,7 +63,16 @@ int main(int argc, char** argv){
 
 	cout << "Final length: " << tour.lenPath << endl;
 
-	tour.sendFile();	
+	//end timer for the algorithm
+	end = clock();
+	//hold the difference between the two times
+	double difference = ((double)end)-((double)start);
+
+	//calculate the difference between now and the starting time
+	time = difference / (double(CLOCKS_PER_SEC)/(double(1000))); //clocks_per_sec will give the number of seconds per tick of the clock to help find the overall seconds
+	cout<<"Time (Milliseconds): "<<time<<endl;
+
+	tour.sendFile();
 
 	return 0;
 }
