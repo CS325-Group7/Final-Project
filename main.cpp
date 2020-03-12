@@ -46,7 +46,11 @@ int main(int argc, char** argv){
 
 	for(i=0; i<tourSize; i++){
 
-		fin = tour.findPath(i);
+		vector<int> paths;
+		tour.eulerCircuit(i, paths);
+		int len;
+		tour.eulerHP(paths, len);
+		fin = len;
 
 		tour.lengths[i][0] = i;
 		tour.lengths[i][1] = fin;

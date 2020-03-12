@@ -248,11 +248,19 @@ void TSP::addList(int parent[]){
 		}
 	}
 }
+
+// finds the odd nodes
+// adds to subgraph
+// finds a matching subgraph
  
 void TSP::matchOdds(){
 
+	// initialize variables
+
 	std::vector<int>::iterator start;
 	std::vector<int>::iterator temp;
+	vector<int>::iterator iter;
+	vector<int>::iterator stop;
 	
 	int len;
 	int nearest;
@@ -263,8 +271,15 @@ void TSP::matchOdds(){
 	
 	for(i=0; i<verts; i++){
 
-		if((adj_list[i].size()%2) != 0){
+		if((adj_list[i].size()%2) == 0){
 
+			continue;
+
+		}	
+
+		// if odd, add to subgraph list
+
+		else{
 			oddPairs.push_back(i);
 		}
 	}
@@ -272,23 +287,36 @@ void TSP::matchOdds(){
 	
 	while(!oddPairs.empty()){
 
-		vector<int>::iterator iter;
-		vector<int>::iterator stop = oddPairs.end();
 		start = oddPairs.begin();
+		stop = oddPairs.end();
 
 		len = INT_MAX;
-		for(iter = oddPairs.begin()+1; iter != stop; iter++){
 
-			if(graph[*start][*iter] < len){
+		iter = oddPairs.begin()+1;
+
+		// iterate through the odd nodes
+
+		while(iter != stop){
+
+			// if the node is closer in distance
+
+			if(len > graph[*start][*iter]){
 
 				len = graph[*start][*iter];
 				nearest = *iter;
 				temp = iter;
 			}
+
+			iter ++;
 		}
 		
+		// update adjacency list
+
 		adj_list[*start].push_back(nearest);
 		adj_list[nearest].push_back(*start);
+
+		// remove from odds
+
 		oddPairs.erase(temp);
 		oddPairs.erase(start);
 	}
@@ -384,19 +412,6 @@ void TSP::eulerHP(vector<int> &path, int &cost){
 	}
 
 	cost += graph[*curr][*next];
-}
-
-int TSP::findPath(int begin){
-
-	// initialize variables
-	
-	vector<int> paths;
-	int len;
-
-	eulerCircuit(begin, paths);
-	eulerHP(paths, len);
-
-	return len;		
 }
 
 // adds the information to the .tour files

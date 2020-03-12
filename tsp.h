@@ -85,7 +85,6 @@ class TSP{
 		void addList(int parent[]);
 		void eulerCircuit(int begin, vector<int> &path);
 		void eulerHP(vector<int> &path, int &cost);
-		int findPath(int begin);
 		void sendFile();
 		int tour_size();
 };
