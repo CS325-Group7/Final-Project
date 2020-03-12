@@ -46,7 +46,6 @@ class TSP{
 		vector<int>oddPairs;
 		
 		string file_in;
-		string file_out;
 
 	public:
 
@@ -70,7 +69,7 @@ class TSP{
 
 		int verts;
 		int lenPath;
-
+		string file_out;
 		vector<Cities> cityList;
 		vector<int> cycle;
 
@@ -86,6 +85,5 @@ class TSP{
 		void eulerCircuit(int begin, vector<int> &path);
 		void eulerHP(vector<int> &path, int &cost);
 		void sendFile();
-		int tour_size();
 };
 #endif

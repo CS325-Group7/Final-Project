@@ -14,10 +14,15 @@
 int main(int argc, char** argv){
 
 	//start timer for the algorithm
+
 	clock_t start, end;
+
 	//hold the total time at the end
+
 	double time;
+
 	//get current time as the start
+
 	start = clock();
 
 	// initialize variables
@@ -31,51 +36,84 @@ int main(int argc, char** argv){
 	long i;
 	int fin;
 
-	in = out = argv[1];
+	out = argv[1];
+	in = out;
+
+	// make appropriate format
+	
 	out.append(".tour");
 
 	TSP tour(in, out);
-	tourSize = tour.tour_size();
 
-	cout << "fill"<< endl;
+	// size is the number of vertices
+	
+	tourSize = tour.verts;
+
+	// call Christofides functions
+	
 	tour.fillGraph();
-	cout << "mst"<< endl;
+	cout << "finished filling"<< endl;
+	
 	tour.primsMST();
-	cout << "odds"<<endl;
+	cout << "finshed mst"<< endl;
+
 	tour.matchOdds();
+	cout << "finished finding odds" << endl;
 
 	for(i=0; i<tourSize; i++){
+
+		// find the best path length
 
 		vector<int> paths;
 		tour.eulerCircuit(i, paths);
 		int len;
 		tour.eulerHP(paths, len);
+		
 		fin = len;
 
+		// find the start
+
 		tour.lengths[i][0] = i;
+		
+		// find the end
+
 		tour.lengths[i][1] = fin;
+
+		// find the best length there is
 
 		if(tour.lengths[i][1] < opt){
 
 			index = tour.lengths[i][0];
+		
+			// update the optimal
+
 			opt = tour.lengths[i][1];
 		}
 	}
 
+	// make the path for the best tour found
+	
 	tour.eulerCircuit(index, tour.cycle);
 	tour.eulerHP(tour.cycle, tour.lenPath);
 
 	cout << "Final length: " << tour.lenPath << endl;
 
 	//end timer for the algorithm
+
 	end = clock();
+
 	//hold the difference between the two times
+
 	double difference = ((double)end)-((double)start);
 
 	//calculate the difference between now and the starting time
+
 	time = difference / (double(CLOCKS_PER_SEC)/(double(1000))); //clocks_per_sec will give the number of seconds per tick of the clock to help find the overall seconds
+
 	cout<<"Time (Milliseconds): "<<time<<endl;
 
+	// send the output to the files
+	
 	tour.sendFile();
 
 	return 0;

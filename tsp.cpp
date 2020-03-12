@@ -322,6 +322,9 @@ void TSP::matchOdds(){
 	}
 }
 
+// got help for the Euler circuit from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/
+// finds the Euler circuit in the graph
+
 void TSP::eulerCircuit(int begin, vector<int> &path){
 	
 	// initialize variables
@@ -340,30 +343,45 @@ void TSP::eulerCircuit(int begin, vector<int> &path){
 		temp[i] = adj_list[i];
 	}
 
-	path.push_back(begin);
+	path.clear();
 
+	// make sure there is something in the stack
+	
 	while(!stack.empty() || temp[check].size()>0){
 
-		if(temp[check].empty()){
+		// if there are not any nearby nodes
+
+		if(temp[check].empty() == 1){
 
 			path.push_back(check);
 			check = stack.top();
 			stack.pop();
 		}
 
+		// if there are some neighbors
+
 		else{
+
+			// use backtracking to find the remaining circuit
 
 			stack.push(check);
 			close = temp[check].back();
+			
+			// backtrack
+
 			temp[check].pop_back();
 
-			for(i=0; i<temp[close].size(); i++){
+			i=0;
+			
+			while(i<temp[close].size()){
 
 				if(temp[close][i] == check){
 
 					temp[close].erase(temp[close].begin()+i);
 					break;
 				}
+				
+				i++;
 			}
 
 			check = close;
@@ -380,7 +398,7 @@ void TSP::eulerHP(vector<int> &path, int &cost){
 	
 	bool node_in[verts];
 	int i;
-	//cost = 0;
+	
 	vector<int>::iterator curr = path.begin();
 	vector<int>::iterator next = path.begin() + 1;
 
@@ -432,19 +450,16 @@ void TSP::sendFile(){
 	// iterates through the circuit to print out the distances taken
 	// to the file
 	
-	for(iter = cycle.begin(); iter != cycle.end(); ++iter){
+	iter = cycle.begin();
+
+	while(iter != cycle.end()){
 
 		send_out << *iter << endl;
+		
+		iter++;
 	}	
 	
 	send_out.close();
-}
-
-// finds the size of the tour, to be used in the main file
-
-int TSP::tour_size(){
-	
-	return verts;
 }
 
 //set destructor
@@ -461,6 +476,8 @@ TSP::~TSP(){
                 delete[] lengths[i];
         }
 
+	// finish clearing memory
+	
         delete[] lengths;
         delete[] graph;
         delete[] adj_list;
