@@ -48,6 +48,8 @@ class TSP{
 		string file_in;
 		string file_out;
 
+		void oddPair();
+
 	public:
 
 		// set constructor
@@ -71,7 +73,7 @@ class TSP{
 		int verts;
 		int lenPath;
 
-		vector<Cities>cityList;
+		vector<Cities> cityList;
 		vector<int> cycle;
 
 		int **lengths;
@@ -80,12 +82,13 @@ class TSP{
 		
 		void fillGraph();
 		int calcDistance(struct Cities cit1, struct Cities cit2);
+		int getMin(int index[], bool node_in[]);
 		void primsMST();
 		void matchOdds();
 		void eulerCircuit(int begin, vector<int> &path);
 		void eulerHP(vector<int> &path, int &cost);
 		int findPath(int begin);
 		void sendFile();
-		int tour_size();
+		int tour_size(){return verts;};
 };
 #endif

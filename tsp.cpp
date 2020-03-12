@@ -18,7 +18,6 @@ TSP::TSP(string in, string out){
 	
 	file_in = in;
 	file_out= out;
-	//ifStream input_in;
 	int read1;
 	int read2;
 	int read3;
@@ -35,12 +34,13 @@ TSP::TSP(string in, string out){
 
 		input_in >> read1 >> read2 >> read3;
 		
+		count++;
 		// make a new city with the x and y coords
 
 		struct Cities city = {read2, read3};
 		cityList.push_back(city);
 
-		count++;
+		//count++;
 	}		
 	
 	count--;
@@ -55,13 +55,6 @@ TSP::TSP(string in, string out){
 	int i;
 	int j;
 
-	lengths = new int*[verts];
-
-	for(i=0; i<verts; i++){
-
-		lengths[i] = new int[verts];		
-	}
-
 	for(i=0; i<verts; i++){
 	
 		graph[i] = new int[verts];
@@ -71,13 +64,20 @@ TSP::TSP(string in, string out){
 		}				
 	}
 
+	lengths = new int*[verts];
+
+        for(i=0; i<verts; i++){
+
+                lengths[i] = new int[verts];
+        }
+
 	for(i=0; i<cityList.size(); i++){
 	
 		struct Cities curr = cityList[i];
 	}
 	
 	// set up the adjacency list
-	
+
 	adj_list = new vector<int>[verts];	 
 }
 
@@ -119,6 +119,22 @@ int TSP::calcDistance(struct TSP::Cities cit1, struct TSP::Cities cit2){
 	return floor(sqrt(pow(cit1.x-cit2.x,2) + pow(cit1.y-cit2.y,2)));
 }
 
+int TSP::getMin(int index[], bool node_in[]){
+	
+	int min = std::numeric_limits<int>::max();
+  	int min_index;
+	for (int i = 0; i < verts; i++) {
+
+		if(node_in[i] == false && index[i] < min){
+	
+			min = index[i];
+			min_index = i;
+		}	
+	}
+
+	return min_index;
+}
+
 void TSP::primsMST(){
 
 	int index[verts];
@@ -143,16 +159,7 @@ void TSP::primsMST(){
 
 	for(i=0; i<verts-1; i++){
 	
-		for(j= 0; j<verts; j++){
-
-			if(node_in[j] == false && index[j] < min){
-
-				min = index[j]; 
-				minimum = j;
-			}
-		}
-		
-		u = minimum;
+		u = getMin(index, node_in);
 		
 		node_in[u] = true;
 		
@@ -180,10 +187,21 @@ void TSP::primsMST(){
 	}	
 }
 
+void TSP::oddPair(){
+
+	for (int i = 0; i < verts; i++) {
+
+		if((adj_list[i].size()%2) != 0){
+
+			oddPairs.push_back(i);
+		}
+	}
+}
+
 void TSP::matchOdds(){
 
-	std::vector<int>::iterator start;
-	std::vector<int>::iterator temp;
+	std::vector<int>::iterator start, temp;
+	//std::vector<int>::iterator temp;
 	
 	int len;
 	int nearest;
@@ -192,13 +210,15 @@ void TSP::matchOdds(){
 	
 	// find the odds and add to oddPairs
 	
-	for(i=0; i<verts; i++){
+	/*for(i=0; i<verts; i++){
 
 		if((adj_list[i].size()%2) != 0){
 
 			oddPairs.push_back(i);
 		}
-	}
+	}*/
+
+	oddPair();
 	
 	while(!oddPairs.empty()){
 
@@ -209,7 +229,7 @@ void TSP::matchOdds(){
 
 		//len = std::numeric_limits<int>::max();	
 		len = INT_MAX;
-		for(; iter != stop; ++iter){
+		for(; iter != stop; iter++){
 
 			if(graph[*start][*iter] < len){
 
@@ -221,8 +241,8 @@ void TSP::matchOdds(){
 		
 		adj_list[*start].push_back(nearest);
 		adj_list[nearest].push_back(*start);
-		oddPairs.erase(start);
 		oddPairs.erase(temp);
+		oddPairs.erase(start);
 	}
 }
 
@@ -337,12 +357,12 @@ void TSP::sendFile(){
 	// initialize variables
 	
 	ofstream send_out;
-	vector<int>::iterator iter;
+	//vector<int>::iterator iter;
 
 	send_out.open(file_out.c_str(), ios::out);
 	send_out << lenPath << endl;
 	
-	for(iter = cycle.begin(); iter != cycle.end(); iter++){
+	for( vector<int>::iterator iter = cycle.begin(); iter != cycle.end(); ++iter){
 
 		send_out << *iter << endl;
 	}	
@@ -350,7 +370,7 @@ void TSP::sendFile(){
 	send_out.close();
 }
 
-int TSP::tour_size(){
+/*int TSP::tour_size(){
 	
 	return verts;
-}
+}*/

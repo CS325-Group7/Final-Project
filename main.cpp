@@ -38,12 +38,6 @@ int main(int argc, char** argv){
 
 	for(i=0; i<tourSize; i++){
 
-		cout << "eulert"<<endl;
-		//tour.eulerCircuit(index, tour.cycle);	
-		cout << "ham"<<endl;
-		//tour.eulerHP(tour.cycle, tour.lenPath);
-		cout << "best"<<endl;
-
 		fin = tour.findPath(i);
 
 		tour.lengths[i][0] = i;
@@ -56,9 +50,10 @@ int main(int argc, char** argv){
 		}
 	}
 
-	cout << "euler"<<endl;	
 	tour.eulerCircuit(index, tour.cycle);
 	tour.eulerHP(tour.cycle, tour.lenPath);
+
+	cout << "Final length: " << tour.lenPath << endl;
 
 	tour.sendFile();	
 
