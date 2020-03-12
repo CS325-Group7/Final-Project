@@ -48,8 +48,6 @@ class TSP{
 		string file_in;
 		string file_out;
 
-		void oddPair();
-
 	public:
 
 		// set constructor

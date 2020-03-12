@@ -187,21 +187,10 @@ void TSP::primsMST(){
 	}	
 }
 
-void TSP::oddPair(){
-
-	for (int i = 0; i < verts; i++) {
-
-		if((adj_list[i].size()%2) != 0){
-
-			oddPairs.push_back(i);
-		}
-	}
-}
-
 void TSP::matchOdds(){
 
-	std::vector<int>::iterator start, temp;
-	//std::vector<int>::iterator temp;
+	std::vector<int>::iterator start;
+	std::vector<int>::iterator temp;
 	
 	int len;
 	int nearest;
@@ -210,15 +199,14 @@ void TSP::matchOdds(){
 	
 	// find the odds and add to oddPairs
 	
-	/*for(i=0; i<verts; i++){
+	for(i=0; i<verts; i++){
 
 		if((adj_list[i].size()%2) != 0){
 
 			oddPairs.push_back(i);
 		}
-	}*/
+	}
 
-	oddPair();
 	
 	while(!oddPairs.empty()){
 
