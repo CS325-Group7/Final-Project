@@ -136,7 +136,7 @@ int TSP::getMin(int index[], bool node_in[]){
 
 	// initialize the variables
 		
-	int min = std::numeric_limits<int>::max();
+	int min = INT_MAX;
   	int min_index;
 
 	for (int i = 0; i < verts; i++) {
@@ -373,6 +373,8 @@ void TSP::eulerCircuit(int begin, vector<int> &path){
 
 			i=0;
 			
+			// iterate through the temp variable size
+
 			while(i<temp[close].size()){
 
 				if(temp[close][i] == check){
@@ -380,9 +382,13 @@ void TSP::eulerCircuit(int begin, vector<int> &path){
 					temp[close].erase(temp[close].begin()+i);
 					break;
 				}
-				
+			
+				// increment i iterator
+
 				i++;
 			}
+
+			// current gets neighbor
 
 			check = close;
 
@@ -391,6 +397,9 @@ void TSP::eulerCircuit(int begin, vector<int> &path){
 	
 	path.push_back(check);
 }
+
+// takes the Euler circuit and turns it into 
+// a Hamiltonian path
 
 void TSP::eulerHP(vector<int> &path, int &cost){
 	
@@ -404,22 +413,28 @@ void TSP::eulerHP(vector<int> &path, int &cost){
 
 	int starting = path.front();
 
+	// takes away the visited nodes
+	
 	for(i=0; i<verts; i++){
 
 		node_in[i] = 0;
 	}		
 	
+	// start the cost of the path off at 0
+	
 	cost = 0;
 
+	// the root is visted so gets a 1 to represent
+	
 	node_in[starting] = 1;
 	
-	while(next != path.end()){
+	while(next - path.end() != 0){
 
-		if(!node_in[*next]){
+		if(node_in[*next] == 0){
 
 			cost += graph[*curr][*next];
 			curr = next;
-			node_in[*curr] = 1;
+			node_in[*curr] = true;
 			next = curr +1;
 		}	
 
