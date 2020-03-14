@@ -111,15 +111,15 @@ void TSP::fillGraph(){
 
 			// calculates the x distance
 
-			xvar = cityList[i].x - cityList[j].x;
+			xvar = pow((float)(cityList[i].x - cityList[j].x),2);
 			
 			// calculates the y distance
 
-			yvar = cityList[i].y- cityList[j].y;
+			yvar = pow((float)(cityList[i].y- cityList[j].y),2);
 			
 			// calculates the distance with the equation provided in the assignment
 
-			dis = floor(sqrt(pow(xvar, 2) + pow(yvar, 2)));
+			dis = floor((float)sqrt(xvar + yvar)+0.5);
 			
 			// set up graph
 
